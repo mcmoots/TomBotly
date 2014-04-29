@@ -1,12 +1,14 @@
 # take a sentence, attempt to make a Tom Swifty pun
 
+import random
+
 from nltk.corpus import wordnet as wn
+
 # set up stemmer
 from nltk.stem.porter import *
 stemmer = PorterStemmer()
-
-import re
-import random
+import nltk.data
+sentence_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 
 # load dictionary
 sowpods = set(line.strip() for line in open('sowpods.txt'))
@@ -81,9 +83,6 @@ def swiftify_string(tweet, handle, maxlength):
     Step 3: Assemble & return string
     """
 
-    # TODO clean the tweet - strip hashtags, URLs, etc.
-    # TODO pull just 1 sentence from the cleaned tweet, instead of the whole thing.
-
     # split string into words - does NLTK have a better thing for this?
     words = [wn.morphy(word.lower()) for word in tweet.split()]
     words = [w for w in words if w is not None]
@@ -99,11 +98,22 @@ def swiftify_string(tweet, handle, maxlength):
 
     # string: "tweet", said @handle adverbly.
     # length: tweet length + handle length + 12
-    max_adv_length = maxlength - 12 - len(tweet) - len(handle)
+    max_adv_length = maxlength - 13 - len(tweet) - len(handle)
     adverbly = random.choice([a for a in adverbs if len(a) <= max_adv_length])
 
-    tweetstring = '"' + tweet + '", said @' + handle + ' ' + adverbly
+    tweetstring = '"' + tweet + '", said @' + handle + ' ' + adverbly + '.'
     return tweetstring
 
-
-
+#todo: rename this function
+#todo: stop spitting out errors when swiftify_string returns a blank (replies = [None])
+def pull_sentence_from_tweet(tweet):
+    sentences = sentence_detector.tokenize(tweet.text)
+    replies = []
+    for s in sentences:
+        # todo clean hashtags, urls, @-replies, etc
+        replies.append( swiftify_string(s, tweet.user.screen_name, 140) )
+    replies = filter(None, replies)
+    if [None] != replies:
+        return random.choice(replies)
+    else:
+        return None

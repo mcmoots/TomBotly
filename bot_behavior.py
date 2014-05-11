@@ -1,6 +1,7 @@
 import yaml
 import twitter
 import random
+import sys
 import swifties
 
 last_tweet_file = "last_tweet.txt"
@@ -30,11 +31,24 @@ f.close()
 # Pull tweets from bot's home timeline
 tweets_full = api.GetHomeTimeline(exclude_replies=True, since_id=last_tweet)
 tweets = [tweet for tweet in tweets_full if tweet.retweeted_status is None]
-tweet = random.choice(tweets)
 
-#todo: loop this - if it can't find something on first try, pick a different tweet
-reply_text = swifties.pull_sentence_from_tweet(tweet)
-api.PostUpdate(reply_text, in_reply_to_status_id=tweet.id)
+if len(tweets) == 0:
+    sys.exit()
+
+tries = 0
+while tries < 4:
+    tweet = random.choice(tweets)
+    reply_text = swifties.pull_sentence_from_tweet(tweet)
+    if None == reply_text:
+        tries += 1
+        continue
+
+    try:
+        api.PostUpdate(reply_text, in_reply_to_status_id=tweet.id)
+        break
+    except twitter.TwitterError:
+        tries += 1
+
 
 #store most recently seen tweet id
 f = open(last_tweet_file, "w")

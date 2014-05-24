@@ -3,6 +3,7 @@ import twitter
 import random
 import sys
 import swifties
+from wordnik import *
 
 if len(sys.argv) > 1:
     rootdir = sys.argv[1]
@@ -18,8 +19,8 @@ api = twitter.Api(**confs['twitter_tokens'])
 wordnik_url = 'http://api.wordnik.com/v4'
 wordnik_key = confs['wordnik_key']
 client = swagger.ApiClient(wordnik_key, wordnik_url)
-wordApi = WordApi.WordApi(client)
-
+wordnik = WordApi.WordApi(client)
+swifties.wordnik = wordnik
 
 # Follow/unfollow
 
@@ -47,7 +48,7 @@ tweets = [tweet for tweet in tweets_full if tweet.retweeted_status is None]
 if len(tweets) == 0:
     sys.exit()
 
-authors = set([tw._user for tweet in tweets])
+authors = set([tweet._user for tweet in tweets])
 
 tries = 0
 while tries < 4:

@@ -3,6 +3,7 @@
 import random
 
 from nltk.corpus import stopwords
+from nltk.corpus import wordnet as wn
 
 # set up stemmer
 from nltk.stem.porter import *
@@ -40,7 +41,7 @@ def find_ly_adverb(word):
 def find_syns(word, explain=False):
     'Take a word, get synonyms, check each for an -ly adverb'
 
-    synos = wordApi.getRelatedWords(word, useCanonical=True, relationshipTypes='synonym')
+    synos = wordnik.getRelatedWords(word, useCanonical=True, relationshipTypes='synonym')
 
     if synos == None:
         return []

@@ -2,7 +2,7 @@
 
 import random
 
-from nltk.corpus import wordnet as wn
+from nltk.corpus import stopwords
 
 # set up stemmer
 from nltk.stem.porter import *
@@ -17,8 +17,8 @@ sowpodsly = filter(ends_in_ly.search, sowpods)
 
 # WordNet stop list
 # http://www.d.umn.edu/~tpederse/Group01/WordNet/wordnet-stoplist.html
-wn_stops = ['i', 'a', 'an', 'as', 'at', 'by', 'he', 'his', 'me', 'or', 'thou', 'us', 'who']
-wn_stops += ['are', 'out']
+stops = stopwords.words('english')
+stops += ['are', 'out', 'guy', 'was', 'so', 'is', 'in', 'do', 'thou']
 
 def find_ly_adverb(word):
     """Take a word and return an -ly adverb for it
@@ -38,40 +38,18 @@ def find_ly_adverb(word):
 
 
 def find_syns(word, explain=False):
-    'Take a word, traverse its wordnet synsets, check each lemma for an -ly adverb'
-    if len(wn.synsets(word)) == 0:
+    'Take a word, get synonyms, check each for an -ly adverb'
+
+    synos = wordApi.getRelatedWords(word, useCanonical=True, relationshipTypes='synonym')
+
+    if synos == None:
         return []
 
+    syns = synos[0].words
     adverbs = []
-    syns = []
-    hyps = []
-    ants = []
-    # make a set of all lemma names, to speed up searching for adverbs
-    # todo - write different rules for len(wn.synsets(word)) > 12. Polysemy returns too much obscure nonsense.
-    for sset in wn.synsets(word):
-        syns += [syn for syn in sset.lemma_names]
-        for hyp in sset.hypernyms():
-            hyps += [lemma for lemma in hyp.lemma_names]
-        for l in sset.lemmas:
-            ants += [a.name for a in l.antonyms()]
 
-    jokes = set(syns + hyps + ants)
-
-    if True == explain:
-        syns = set(syns)
-        hyps = set(hyps)
-        ants = set(ants)
-        print 'Synonyms: '
-        print syns
-        print 'Hypernyms: '
-        print hyps
-        print 'Antonyms: '
-        print ants
-
-    # TODO exclude syns that have the same stem as word
-
-    for joke in jokes:
-        adverbs += find_ly_adverb(joke)
+    for syn in syns:
+        adverbs += find_ly_adverb(syn)
 
     return adverbs
 
@@ -90,7 +68,7 @@ def swiftify_string(tweet, handle, maxlength):
 
     # todo parse parts of speech, send only non-verbs/non-adverbs?
     for word in words:
-        if len(word) > 2 and word.lower() not in wn_stops:
+        if len(word) > 2 and word.lower() not in stops:
             adverbs += find_syns(word.lower(), False)
 
     if len(adverbs) == 0:

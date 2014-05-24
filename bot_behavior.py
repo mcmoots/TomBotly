@@ -15,6 +15,11 @@ last_tweet_file = rootdir + "last_tweet.txt"
 confs = yaml.load(open(rootdir + 'config.yaml'))
 api = twitter.Api(**confs['twitter_tokens'])
 
+wordnik_url = 'http://api.wordnik.com/v4'
+wordnik_key = confs['wordnik_key']
+client = swagger.ApiClient(wordnik_key, wordnik_url)
+wordApi = WordApi.WordApi(client)
+
 
 # Follow/unfollow
 
@@ -42,11 +47,12 @@ tweets = [tweet for tweet in tweets_full if tweet.retweeted_status is None]
 if len(tweets) == 0:
     sys.exit()
 
-#todo - give equal chance to every follower who's tweeted, rather than picking random tweets
+authors = set([tw._user for tweet in tweets])
 
 tries = 0
 while tries < 4:
-    tweet = random.choice(tweets)
+    author = random.sample(authors, 1)[0]
+    tweet = random.choice([tweet for tweet in tweets if tweet._user == author])
     reply_text = swifties.pull_sentence_from_tweet(tweet)
     if None == reply_text:
         tries += 1

@@ -4,10 +4,17 @@ import random
 import sys
 import swifties
 
-last_tweet_file = "last_tweet.txt"
+if len(sys.argv) > 1:
+    rootdir = sys.argv[1]
+else:
+    rootdir = './'
 
-twitter_tokens = yaml.load(open('config.yaml'))
-api = twitter.Api(**twitter_tokens)
+
+last_tweet_file = rootdir + "last_tweet.txt"
+
+confs = yaml.load(open(rootdir + 'config.yaml'))
+api = twitter.Api(**confs['twitter_tokens'])
+
 
 # Follow/unfollow
 
@@ -34,6 +41,8 @@ tweets = [tweet for tweet in tweets_full if tweet.retweeted_status is None]
 
 if len(tweets) == 0:
     sys.exit()
+
+#todo - give equal chance to every follower who's tweeted, rather than picking random tweets
 
 tries = 0
 while tries < 4:

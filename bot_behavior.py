@@ -5,6 +5,8 @@ import sys
 import swifties
 from wordnik import *
 
+
+# define project root
 if len(sys.argv) > 1:
     rootdir = sys.argv[1]
 else:

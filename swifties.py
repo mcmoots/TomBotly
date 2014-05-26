@@ -1,18 +1,27 @@
 # take a sentence, attempt to make a Tom Swifty pun
-
+import sys
 import random
+
 
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
 
+
 # set up stemmer
 from nltk.stem.porter import *
+
 stemmer = PorterStemmer()
 import nltk.data
 sentence_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 
+# define project root
+if len(sys.argv) > 1:
+    rootdir = sys.argv[1]
+else:
+    rootdir = './'
+
 # load dictionary
-sowpods = set(line.strip() for line in open('sowpods.txt'))
+sowpods = set(line.strip() for line in open(rootdir + 'sowpods.txt'))
 ends_in_ly = re.compile('ly$')
 sowpodsly = filter(ends_in_ly.search, sowpods)
 

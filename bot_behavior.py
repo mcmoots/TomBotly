@@ -50,12 +50,12 @@ tweets = [tweet for tweet in tweets_full if tweet.retweeted_status is None]
 if len(tweets) == 0:
     sys.exit()
 
-authors = set([tweet._user for tweet in tweets])
+authors = set([tweet.user.screen_name for tweet in tweets])
 
 tries = 0
 while tries < 4:
     author = random.sample(authors, 1)[0]
-    tweet = random.choice([tweet for tweet in tweets if tweet._user == author])
+    tweet = random.choice([tweet for tweet in tweets if tweet.user.screen_name == author])
     reply_text = swifties.pull_sentence_from_tweet(tweet)
     if None == reply_text:
         tries += 1

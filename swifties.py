@@ -78,7 +78,11 @@ class Swifties:
         # string: "tweet", said @handle adverbly.
         # length: tweet length + handle length + 12
         max_adv_length = maxlength - 13 - len(tweet) - len(handle)
-        adverbly = random.choice([a for a in adverbs if len(a) <= max_adv_length])
+        advs = [a for a in adverbs if len(a) <= max_adv_length]
+        if len(advs) > 0:
+            adverbly = random.choice(advs)
+        else:
+            return None
 
         tweetstring = '"' + tweet + '", said @' + handle + ' ' + adverbly + '.'
         return tweetstring

@@ -27,7 +27,8 @@ class BotSwifty:
     def run_bot(self):
 
         # Follow/unfollow
-        followers = set([fol.id for fol in self.api.GetFollowers()])
+        # Omit protected users from "followers" list to avoid issuing follow requests
+        followers = set([fol.id for fol in self.api.GetFollowers() if fol.protected == False ])
         following = set([fol.id for fol in self.api.GetFriends()])
 
         to_follow = followers - following   # followers who are not yet followed
@@ -98,4 +99,4 @@ if __name__ == '__main__':
 
     while True:
         b.run_bot()
-        sleep(10987)
+        sleep(random.randrange(9999,11111))
